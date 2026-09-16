@@ -1,0 +1,142 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Dashboard - Library Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Library Overview</h1>
+        <p class="text-muted mb-0">System metrics and recent activity summary</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'book_add' %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-journal-plus me-1"></i> Add Book
+        </a>
+        <a href="{% url 'member_add' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-person-plus me-1"></i> Register Member
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Total Books</div>
+                    <div class="stat-number">{{ total_books }}</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-bookshelf"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Available Copies</div>
+                    <div class="stat-number">{{ available_books }}</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Borrowed Books</div>
+                    <div class="stat-number">{{ borrowed_books }}</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Total Members</div>
+                    <div class="stat-number">{{ total_members }}</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Borrowing Activity Card -->
+<div class="custom-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2 text-primary"></i>Recent Borrowing Activity</span>
+        <a href="{% url 'borrowing_list' %}" class="btn btn-link btn-sm p-0 text-decoration-none">View All Borrowings &rarr;</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom align-middle">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Member</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in recent_activity %}
+                <tr>
+                    <td>
+                        <a href="{% url 'book_detail' record.book.pk %}" class="fw-bold text-decoration-none text-dark">
+                            {{ record.book.title }}
+                        </a>
+                        <br><small class="text-muted">ISBN: {{ record.book.isbn }}</small>
+                    </td>
+                    <td>
+                        <a href="{% url 'member_detail' record.member.pk %}" class="text-decoration-none text-primary">
+                            {{ record.member.name }}
+                        </a>
+                        <br><small class="text-muted">{{ record.member.membership_id }}</small>
+                    </td>
+                    <td>{{ record.issue_date }}</td>
+                    <td>{{ record.due_date }}</td>
+                    <td>
+                        {% if record.status == 'returned' %}
+                            <span class="badge badge-returned"><i class="bi bi-check-lg me-1"></i>Returned</span>
+                        {% elif record.is_overdue %}
+                            <span class="badge badge-overdue"><i class="bi bi-exclamation-triangle-fill me-1"></i>Overdue</span>
+                        {% else %}
+                            <span class="badge badge-borrowed"><i class="bi bi-book-half me-1"></i>Borrowed</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if record.status != 'returned' %}
+                            <a href="{% url 'borrow_return' record.pk %}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-arrow-return-left"></i> Return
+                            </a>
+                        {% else %}
+                            <span class="text-muted small">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        No recent borrowing records found. <a href="{% url 'borrow_issue' %}">Issue a book now</a>.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

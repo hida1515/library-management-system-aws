@@ -1,0 +1,87 @@
+{% extends 'library/base.html' %}
+
+{% block title %}{{ title }} - Library Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="mb-3">
+            <a href="{% url 'book_list' %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left"></i> Back to Books Directory
+            </a>
+        </div>
+
+        <div class="custom-card p-4">
+            <h2 class="h4 font-weight-bold text-primary mb-3">{{ title }}</h2>
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Book Title <span class="text-danger">*</span></label>
+                        {{ form.title }}
+                        {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Author Name <span class="text-danger">*</span></label>
+                        {{ form.author }}
+                        {% if form.author.errors %}<div class="text-danger small mt-1">{{ form.author.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ISBN Number <span class="text-danger">*</span></label>
+                        {{ form.isbn }}
+                        {% if form.isbn.errors %}<div class="text-danger small mt-1">{{ form.isbn.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                        {{ form.category }}
+                        {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Publisher <span class="text-danger">*</span></label>
+                        {{ form.publisher }}
+                        {% if form.publisher.errors %}<div class="text-danger small mt-1">{{ form.publisher.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Publication Year <span class="text-danger">*</span></label>
+                        {{ form.publication_year }}
+                        {% if form.publication_year.errors %}<div class="text-danger small mt-1">{{ form.publication_year.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Total Quantity <span class="text-danger">*</span></label>
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}<div class="text-danger small mt-1">{{ form.quantity.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Available Quantity <span class="text-danger">*</span></label>
+                        {{ form.available_quantity }}
+                        {% if form.available_quantity.errors %}<div class="text-danger small mt-1">{{ form.available_quantity.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'book_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-lg me-1"></i> Save Book Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

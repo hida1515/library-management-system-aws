@@ -1,0 +1,29 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Delete Member - {{ member.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="custom-card p-4 text-center">
+            <div class="text-danger mb-3">
+                <i class="bi bi-person-x-fill display-4"></i>
+            </div>
+            <h2 class="h4 font-weight-bold text-dark">Delete Member Confirmation</h2>
+            <p class="text-muted">
+                Are you sure you want to delete the member record for:
+                <br><strong class="text-dark fs-5">{{ member.name }} ({{ member.membership_id }})</strong>?
+            </p>
+            <p class="small text-danger">This will remove their membership record from the library database.</p>
+
+            <form method="POST" class="d-flex justify-content-center gap-2 mt-4">
+                {% csrf_token %}
+                <a href="{% url 'member_list' %}" class="btn btn-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash-fill me-1"></i> Confirm Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

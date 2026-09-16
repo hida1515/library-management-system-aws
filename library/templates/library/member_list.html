@@ -1,0 +1,85 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Members Directory - Library Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Library Members Directory</h1>
+        <p class="text-muted mb-0">Registered library patrons, contact info, and borrowing profiles</p>
+    </div>
+    <a href="{% url 'member_add' %}" class="btn btn-primary d-flex align-items-center gap-1">
+        <i class="bi bi-person-plus-fill"></i> Register New Member
+    </a>
+</div>
+
+<!-- Search Bar -->
+<div class="custom-card p-3 mb-4">
+    <form method="GET" action="{% url 'member_list' %}" class="row g-2 align-items-center">
+        <div class="col-md-10">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search by member name, email, phone, or membership ID..." value="{{ query }}">
+            </div>
+        </div>
+        <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-secondary w-100">Search</button>
+            {% if query %}
+                <a href="{% url 'member_list' %}" class="btn btn-outline-danger" title="Clear Search"><i class="bi bi-x-lg"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Members Table -->
+<div class="custom-card">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle">
+            <thead>
+                <tr>
+                    <th>Membership ID</th>
+                    <th>Member Name</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th>Joined Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                    <td><span class="badge bg-secondary font-monospace">{{ member.membership_id }}</span></td>
+                    <td>
+                        <a href="{% url 'member_detail' member.pk %}" class="fw-bold text-dark text-decoration-none fs-6">
+                            {{ member.name }}
+                        </a>
+                    </td>
+                    <td><a href="mailto:{{ member.email }}" class="text-decoration-none text-muted">{{ member.email }}</a></td>
+                    <td><small>{{ member.phone }}</small></td>
+                    <td><small class="text-muted">{{ member.joined_date }}</small></td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'member_detail' member.pk %}" class="btn btn-outline-info" title="View Profile">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'member_edit' member.pk %}" class="btn btn-outline-primary" title="Edit Member">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'member_delete' member.pk %}" class="btn btn-outline-danger" title="Delete Member">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        No members registered yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

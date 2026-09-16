@@ -1,0 +1,98 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Borrowing Records - Library Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Borrowing Records & Transactions</h1>
+        <p class="text-muted mb-0">Track issued books, return timelines, and overdue items</p>
+    </div>
+    <a href="{% url 'borrow_issue' %}" class="btn btn-warning d-flex align-items-center gap-1 font-weight-bold">
+        <i class="bi bi-journal-arrow-up"></i> Issue New Book
+    </a>
+</div>
+
+<!-- Status Filter Tabs -->
+<div class="mb-4">
+    <ul class="nav nav-pills custom-pills bg-white p-1 rounded shadow-sm d-inline-flex border">
+        <li class="nav-item">
+            <a class="nav-link {% if not status_filter %}active{% endif %}" href="{% url 'borrowing_list' %}">All Records</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'borrowed' %}active{% endif %}" href="{% url 'borrowing_list' %}?status=borrowed">Active Borrowed</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'overdue' %}active{% endif %}" href="{% url 'borrowing_list' %}?status=overdue">Overdue</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'returned' %}active{% endif %}" href="{% url 'borrowing_list' %}?status=returned">Returned</a>
+        </li>
+    </ul>
+</div>
+
+<!-- Borrowings Table -->
+<div class="custom-card">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle">
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th>Book Title</th>
+                    <th>Borrower Member</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in borrowings %}
+                <tr>
+                    <td><code>#{{ record.id }}</code></td>
+                    <td>
+                        <a href="{% url 'book_detail' record.book.pk %}" class="fw-bold text-dark text-decoration-none">
+                            {{ record.book.title }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'member_detail' record.member.pk %}" class="text-decoration-none text-primary fw-semibold">
+                            {{ record.member.name }}
+                        </a>
+                        <br><small class="text-muted">{{ record.member.membership_id }}</small>
+                    </td>
+                    <td><small>{{ record.issue_date }}</small></td>
+                    <td><small class="{% if record.is_overdue %}text-danger fw-bold{% endif %}">{{ record.due_date }}</small></td>
+                    <td><small class="text-muted">{{ record.return_date|default:"--" }}</small></td>
+                    <td>
+                        {% if record.status == 'returned' %}
+                            <span class="badge badge-returned"><i class="bi bi-check-lg me-1"></i>Returned</span>
+                        {% elif record.is_overdue %}
+                            <span class="badge badge-overdue"><i class="bi bi-exclamation-circle-fill me-1"></i>Overdue</span>
+                        {% else %}
+                            <span class="badge badge-borrowed"><i class="bi bi-book-half me-1"></i>Borrowed</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if record.status != 'returned' %}
+                            <a href="{% url 'borrow_return' record.pk %}" class="btn btn-outline-success btn-sm font-weight-bold">
+                                <i class="bi bi-arrow-return-left"></i> Mark Returned
+                            </a>
+                        {% else %}
+                            <span class="badge bg-light text-muted border">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        No borrowing transactions found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Books Directory - Library Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Books Catalog</h1>
+        <p class="text-muted mb-0">Manage library books inventory, stock availability, and metadata</p>
+    </div>
+    <a href="{% url 'book_add' %}" class="btn btn-primary d-flex align-items-center gap-1">
+        <i class="bi bi-plus-lg"></i> Add New Book
+    </a>
+</div>
+
+<!-- Search & Category Filter Bar -->
+<div class="custom-card p-3 mb-4">
+    <form method="GET" action="{% url 'book_list' %}" class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search by title, author, ISBN, or publisher..." value="{{ query }}">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Filter by Category --</option>
+                {% for cat in categories %}
+                    <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-1">
+            <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            {% if query or category_filter %}
+                <a href="{% url 'book_list' %}" class="btn btn-outline-danger" title="Clear Filters"><i class="bi bi-x-lg"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Books Catalog Table -->
+<div class="custom-card">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle">
+            <thead>
+                <tr>
+                    <th>Title & Author</th>
+                    <th>ISBN</th>
+                    <th>Category</th>
+                    <th>Publisher / Year</th>
+                    <th>Stock (Available)</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>
+                        <a href="{% url 'book_detail' book.pk %}" class="fw-bold text-dark text-decoration-none fs-6">
+                            {{ book.title }}
+                        </a>
+                        <br><small class="text-muted"><i class="bi bi-person-fill"></i> {{ book.author }}</small>
+                    </td>
+                    <td><code>{{ book.isbn }}</code></td>
+                    <td><span class="badge bg-light text-dark border">{{ book.category }}</span></td>
+                    <td><small>{{ book.publisher }} ({{ book.publication_year }})</small></td>
+                    <td>
+                        <span class="fw-semibold">{{ book.available_quantity }}</span> / <span class="text-muted">{{ book.quantity }}</span>
+                    </td>
+                    <td>
+                        {% if book.available_quantity > 0 %}
+                            <span class="badge badge-available"><i class="bi bi-check-circle-fill me-1"></i>Available</span>
+                        {% else %}
+                            <span class="badge badge-unavailable"><i class="bi bi-x-circle-fill me-1"></i>Out of Stock</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'book_detail' book.pk %}" class="btn btn-outline-info" title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'book_edit' book.pk %}" class="btn btn-outline-primary" title="Edit Book">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'book_delete' book.pk %}" class="btn btn-outline-danger" title="Delete Book">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        No books found matching your criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
